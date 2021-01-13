@@ -23,8 +23,6 @@ public class Cliente {
 	Scanner s;
 	//String para almacenamiento de datos necesarios
 	private String destinatario,mens,accion;
-	//HashMap donde recibiremos todos los mensajes con sus destinatarios
-	private HashMap<String, ArrayList<Mensaje>> mismensajes;
 	//Array donde se almacenaran los mensajes que van dirigidos a mi
 	private ArrayList<Mensaje> miarraypropio;
 	//canal de salida de datos
@@ -42,28 +40,31 @@ public class Cliente {
 		socket.connect(addr);
 		entrada  =new ObjectInputStream(socket.getInputStream());
 		salida=new ObjectOutputStream(socket.getOutputStream());
-		
-			while(true) {
-					recibirBienvenida();
-				if(accion.equals("enviar")) {
-					DarDestinatario() ;
-					DarMensaje();
-				}else if(accion.equals("consultar")) {
-					ConsultarMensaje() ;
-				}else if(accion.equals("salir")) {
-					//SI QUIERE SALIR SE CIERRA EL SOCKET Y EL CANAL DE COMUNICACION
-					entrada.close();
-					salida.close();
-					socket.close();
-					break;
-				}
-				else {
-					System.out.println("no entiendo la accion ");
-				}
-			}
+		clientestart();	
 		}
 				
 	
+	public void clientestart() throws ClassNotFoundException, IOException {
+		while(true) {
+			recibirBienvenida();
+		if(accion.equals("enviar")) {
+			DarDestinatario() ;
+			DarMensaje();
+		}else if(accion.equals("consultar")) {
+			ConsultarMensaje() ;
+		}else if(accion.equals("salir")) {
+			//SI QUIERE SALIR SE CIERRA EL SOCKET Y EL CANAL DE COMUNICACION
+			entrada.close();
+			salida.close();
+			socket.close();
+			break;
+		}
+		
+		else {
+			System.out.println("no entiendo la accion ");
+		}
+	}
+	}
 	public void recibirBienvenida() throws ClassNotFoundException, IOException {
 		//LEO EL MENSAJE DEL SERVIDOR DE BIENVENIDA
 		Mensaje m=(Mensaje) entrada.readObject();
