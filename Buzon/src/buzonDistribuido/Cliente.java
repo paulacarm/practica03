@@ -39,10 +39,9 @@ public class Cliente {
 		InetSocketAddress addr=new InetSocketAddress("localhost",5555);
 		miarraypropio=new ArrayList<Mensaje>();
 		this.s=new Scanner(System.in);
-	
-			socket.connect(addr);
-			entrada  =new ObjectInputStream(socket.getInputStream());
-			salida=new ObjectOutputStream(socket.getOutputStream());
+		socket.connect(addr);
+		entrada  =new ObjectInputStream(socket.getInputStream());
+		salida=new ObjectOutputStream(socket.getOutputStream());
 		
 			while(true) {
 					recibirBienvenida();
@@ -73,6 +72,10 @@ public class Cliente {
 		accion=s.nextLine();
 		Mensaje vuelta= new Mensaje(accion);
 		salida.writeObject(vuelta);
+		//LE MANDO TAMBIÉN MI NOMBRE
+		Mensaje mensaj=new Mensaje(this.nombre);
+		salida.writeObject(mensaj);
+		
 	}
 	
 	public void DarDestinatario() throws ClassNotFoundException, IOException {
@@ -101,22 +104,21 @@ public class Cliente {
 	
 	@SuppressWarnings("unchecked")
 	public void ConsultarMensaje() throws ClassNotFoundException, IOException {
-		//RECIBO LOS MENSAJES DEL SERVIDOR PARA VER CUALES SON PARA MI
-		//guardo los que sean mios en un array y los muestro
-		
-		mismensajes=(HashMap<String, ArrayList<Mensaje>>) entrada.readObject();
-		System.out.println("mensajes para tí, "+this.nombre);
-		
-		for (String clave :mismensajes.keySet()) {
-			miarraypropio = mismensajes.get(clave);
-		    if(clave.contains(this.nombre)) {
-		    	for (Mensaje mensaje : miarraypropio) {
-		    		mensaje.muestraMensaje();
-		    	 }
-		    }
-		   
+		//RECIBO MI ARRAY DE MENSAJES DEL SERVIDOR Y EN EL CASO DE TENERLOS ,LOS MUESTRO.
+		miarraypropio=(ArrayList<Mensaje>) entrada.readObject();
+		if(!miarraypropio.isEmpty()) {
+			System.out.println("mensajes para tí, "+this.nombre);
+			for (int i=0;i<miarraypropio.size();i++) {
+				miarraypropio.get(i).MuestraTodo();
+			}
 		}
+		else
+			System.out.println("no tiene mensajes");
+	
 		
+	
+		
+	
 		
 	}
 
