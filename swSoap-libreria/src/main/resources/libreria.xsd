@@ -1,0 +1,67 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.psp.com/xml/libreria"
+targetNamespace="http://www.psp.com/xml/libreria" elementFormDefault="qualified">
+ 
+    <xs:element name="BookDetailsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+ 
+    <xs:element name="BookDetailsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Book" type="tns:Book"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="AuthorDetailsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+ 
+    <xs:element name="AuthorDetailsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Author" type="tns:Author"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+     <xs:element name="CommentsDetailsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+ 
+    <xs:element name="CommentsDetailsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="comments" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+ 
+    <xs:complexType name="Book">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="author" type="tns:Author"/>
+            <xs:element name="comments" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+        <xs:complexType name="Author">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="nationality" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+     
+</xs:schema>
