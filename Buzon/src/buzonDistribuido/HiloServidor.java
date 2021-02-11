@@ -20,28 +20,31 @@ public class HiloServidor extends Thread {
 	private ObjectOutputStream salida;
 	//canal entrada de datos
 	private ObjectInputStream entrada ;
-	//array donde se guardarán los mensajes exclusivos de un cliente
+	//array donde se guardarÃ¡n los mensajes exclusivos de un cliente
 	private ArrayList <Mensaje> ms;
 	//Datos del mensaje
 	private String destinatario,mensaje;
 	//nombre del cliente para identificarlo y pasarle sus mensajes
 	private Mensaje nombreCliente;
+	private Mensajes buzon;
 	
 
 	
-	public HiloServidor(Socket socket) throws IOException {
+	public HiloServidor(Socket socket,Mensajes buzon) throws IOException {
 		this.socket=socket;
 		salida=new ObjectOutputStream(socket.getOutputStream());
 		entrada  =new ObjectInputStream(socket.getInputStream());
 		ms=new ArrayList<Mensaje>();
+		this.buzon=buzon;
 		
 	}
+
 	public void run() {
 		try {
 			
 			while(true) {
 				//MANDA UN MENSAJE DE BIENVENIDA AL CLIENTE
-				Mensaje m=new Mensaje("Bienvenid@,  ¿Quieres consultar,enviar un mensaje o salir?");
+				Mensaje m=new Mensaje("Bienvenid@,  Â¿Quieres consultar,enviar un mensaje o salir?");
 				salida.writeObject(m);
 				
 				//RECIBO RESPUESTA DE LO QUE QUIERE HACER EL CLIENTE
@@ -64,7 +67,7 @@ public class HiloServidor extends Thread {
 					ConsultarMensajes();
 				}
 				if(recibido.mensaje.contains("salir")) {
-				//SI EL CLIENTE QUIERE SALIR CIERRO LOS SOCKETS Y EL CANAL DE COMUNICACIÓN Y ME SALGO DEL BUCLE.
+				//SI EL CLIENTE QUIERE SALIR CIERRO LOS SOCKETS Y EL CANAL DE COMUNICACIÃ“N Y ME SALGO DEL BUCLE.
 					entrada.close();
 					salida.close();
 					socket.close();
@@ -73,7 +76,7 @@ public class HiloServidor extends Thread {
 							
 			}	
 				
-			} catch (IOException | ClassNotFoundException e) {
+			} catch (IOException | ClassNotFoundException | InterruptedException e) {
 				e.printStackTrace();
 			
 			}
@@ -96,28 +99,43 @@ public class HiloServidor extends Thread {
 		this.mensaje=mensaje.mensaje;		
 	}
 	
-	public  void enviarElMensaje() throws IOException {
+	public  void enviarElMensaje() throws IOException, InterruptedException {
 		//boleano para saber si ya existe como clave el destintario del mensaje
 		boolean existe=false;
-		//MANDO CONFIRMACION AL CLIENTE DE QUE SE ENVIARÁ EL MENSAJE
-		Mensaje m3=new Mensaje("Mensaje enviado");
-		salida.writeObject(m3);
+
 		
 		Mensaje mensaj=new Mensaje(this.nombreCliente.getMensaje(),this.destinatario,this.mensaje);
+		if(buzon.buzondisponile) {
+			synchronized(Mensajes.mensajes) {
+				buzon.setBuzondisponile(false);
+				for (String clave :Mensajes.mensajes.keySet()) {
+				    if(clave.contains(this.destinatario)) {
+				    	ms = Mensajes.mensajes.get(clave);
+				    	ms.add(mensaj);
+				    	existe=true;
+				    }
+				}
+				if(!existe) {
+					//CREO EL OBJETO MENSAJE Y LO Aï¿½ADO AL ARRAY
+					ms.add(mensaj);
+					//GUARDO EL MENSAJE CON EL DESTINATARIO EN EL HASHMAP Y EL ARRAY DE ESE MENSAJES DE ESE DESTINATARIO
+					Mensajes.mensajes.put(this.destinatario,ms);
+				}
+				//MANDO CONFIRMACION AL CLIENTE DE QUE SE ENVIARï¿½ EL MENSAJE
+				Mensaje m3=new Mensaje("Mensaje enviado");
+				salida.writeObject(m3);
+			
+			}
+			buzon.setBuzondisponile(true);
+			buzon.dejarLibre();
+			
+			
+		}
+		while(!buzon.buzondisponile) {
+			wait();
+		}
 		
-		for (String clave :Mensajes.mensajes.keySet()) {
-		    if(clave.contains(this.destinatario)) {
-		    	ms = Mensajes.mensajes.get(clave);
-		    	ms.add(mensaj);
-		    	existe=true;
-		    }
-		}
-		if(!existe) {
-			//CREO EL OBJETO MENSAJE Y LO AÑADO AL ARRAY
-			ms.add(mensaj);
-			//GUARDO EL MENSAJE CON EL DESTINATARIO EN EL HASHMAP Y EL ARRAY DE ESE MENSAJES DE ESE DESTINATARIO
-			Mensajes.mensajes.put(this.destinatario,ms);
-		}
+		
 		
 	}
 	

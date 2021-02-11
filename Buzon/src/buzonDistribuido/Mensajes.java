@@ -15,7 +15,25 @@ public class Mensajes  implements Serializable {
 
 	public static  HashMap<String, ArrayList<Mensaje>> mensajes=new HashMap<String, ArrayList<Mensaje>>();
 	 
+	public boolean buzondisponile;
 	
+	public Mensajes() {
+		this.buzondisponile=true;
+	}
+
+
+	public boolean isBuzondisponile() {
+		return buzondisponile;
+	}
+
+	public void setBuzondisponile(boolean buzondisponile) {
+		this.buzondisponile = buzondisponile;
+		
+	}
+	public synchronized void dejarLibre() {
+		this.notifyAll();
+	}
+
 
 	
 }

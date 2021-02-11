@@ -15,14 +15,14 @@ public class Servidor {
 	public static void main(String[] args) throws IOException {
 		int numeroPuerto = 5555;
 		ServerSocket servidor = new ServerSocket(numeroPuerto);
-		
+		Mensajes buzon= new Mensajes();
 	
 		System.out.println("Esperando al cliente.....");
 		while(true) {
 			//CREA EL SOCKET CLIENTE Y LE PASA LA PETICION DEL CLIENTE A UN HILO SERVIDOR PARA QUE LA ATIENDA
 			Socket cliente = new Socket();
 			cliente = servidor.accept();
-			HiloServidor hilo = new HiloServidor(cliente);
+			HiloServidor hilo = new HiloServidor(cliente,buzon);
 			hilo.start();
 		}
 	}
